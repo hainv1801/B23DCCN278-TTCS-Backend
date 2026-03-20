@@ -15,30 +15,39 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    public User handleCreateUser(User user){
+
+    public User handleCreateUser(User user) {
         return this.userRepository.save(user);
     }
-    public void handleDeleteUser(long id){
+
+    public void handleDeleteUser(long id) {
         this.userRepository.deleteById(id);
     }
-    public User fetchUserById(long id){
+
+    public User fetchUserById(long id) {
         Optional<User> optionalUser = this.userRepository.findById(id);
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             return optionalUser.get();
         }
         return null;
     }
-    public List<User> fetchAllUsers(){
+
+    public List<User> fetchAllUsers() {
         return this.userRepository.findAll();
     }
-    public User handleUpdateUser(User user){
+
+    public User handleUpdateUser(User user) {
         User updateUser = this.fetchUserById(user.getId());
-        if(updateUser != null){
+        if (updateUser != null) {
             updateUser.setName(user.getName());
             updateUser.setEmail(user.getEmail());
             updateUser.setPassword(user.getPassword());
             return this.userRepository.save(updateUser);
         }
         return null;
+    }
+
+    public User handleGetUserByUsername(String username) {
+        return this.userRepository.findByEmail(username);
     }
 }
