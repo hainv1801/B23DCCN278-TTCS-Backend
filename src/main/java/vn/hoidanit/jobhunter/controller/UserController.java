@@ -24,9 +24,10 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.ResCreateUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.ResUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
@@ -94,9 +95,15 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
+    @ApiMessage("Update a user")
+    public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User user) throws IdInvalidException {
         User updatedUser = this.userService.handleUpdateUser(user);
-        return ResponseEntity.ok(updatedUser);
+        if (updatedUser == null) {
+            throw new IdInvalidException("User với id = " + user.getId() + " không tồn tại!!!");
+        }
+        ResUpdateUserDTO res = this.userService
+                .convertToResUpdateUserDTO(updatedUser);
+        return ResponseEntity.ok(res);
 
     }
 }

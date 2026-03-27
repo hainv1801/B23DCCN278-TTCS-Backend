@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain.dto;
+package vn.hoidanit.jobhunter.domain.response;
 
 import java.time.Instant;
 
@@ -8,12 +8,19 @@ import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Setter
 @Getter
-public class ResCreateUserDTO {
+public class ResUpdateUserDTO {
     private long id;
     private String name;
-    private String email;
     private GenderEnum gender;
     private String address;
     private int age;
-    private Instant createdAt;
+    private Instant updatedAt;
+    private CompanyUser companyUser;
+
+    @Getter
+    @Setter
+    public static class CompanyUser {
+        private long id;
+        private String name;
+    }
 }

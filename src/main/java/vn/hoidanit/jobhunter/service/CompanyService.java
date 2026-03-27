@@ -10,19 +10,23 @@ import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.config.DateTimeFormatConfiguration;
 import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.dto.Meta;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
+import vn.hoidanit.jobhunter.repository.UserRepository;
 
 @Service
 public class CompanyService {
     private final DateTimeFormatConfiguration dateTimeFormatConfiguration;
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
     public CompanyService(CompanyRepository companyRepository,
-            DateTimeFormatConfiguration dateTimeFormatConfiguration) {
+            DateTimeFormatConfiguration dateTimeFormatConfiguration,
+            UserRepository userRepository) {
         this.companyRepository = companyRepository;
         this.dateTimeFormatConfiguration = dateTimeFormatConfiguration;
+        this.userRepository = userRepository;
     }
 
     public Company handleCreateCompany(Company company) {
@@ -32,7 +36,7 @@ public class CompanyService {
     public ResultPaginationDTO handleGetCompany(Specification<Company> spec, Pageable pageable) {
         Page<Company> pCompany = this.companyRepository.findAll(spec, pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();
-        Meta mt = new Meta();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
 
         mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
@@ -65,9 +69,16 @@ public class CompanyService {
     }
 
     public void handleDeleteCompany(long id) {
-        Company deletedCompany = this.handleGetCompanyById(id);
-        if (deletedCompany != null) {
-            this.companyRepository.delete(deletedCompany);
+        Optional<Company> optionalCompany = this.findCompanyById(id);
+        if (optionalCompany.isPresent()) {
+            Company company = optionalCompany.get();
+            List<User> users = this.userRepository.findByCompany(company);
+            this.userRepository.deleteAll(users);
         }
+        this.companyRepository.deleteById(id);
+    }
+
+    public Optional<Company> findCompanyById(long id) {
+        return this.companyRepository.findById(id);
     }
 }
