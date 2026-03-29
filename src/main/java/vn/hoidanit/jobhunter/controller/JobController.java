@@ -66,7 +66,7 @@ public class JobController {
         if (optionalJob.isPresent() == false) {
             throw new IdInvalidException("Job với id = " + job.getId() + "không tồn tại!!");
         }
-        ResUpdateJobDTO res = this.jobService.handleUpdateJob(job);
+        ResUpdateJobDTO res = this.jobService.handleUpdateJob(job, optionalJob.get());
         return ResponseEntity.ok(res);
     }
 
