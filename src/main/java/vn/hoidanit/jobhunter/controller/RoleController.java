@@ -23,7 +23,7 @@ import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("/api/v1")
 public class RoleController {
     private final RoleService roleService;
 

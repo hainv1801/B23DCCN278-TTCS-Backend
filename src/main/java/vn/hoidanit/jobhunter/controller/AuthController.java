@@ -69,11 +69,11 @@ public class AuthController {
                 res.setUser(userLogin);
 
                 // create access token
-                String access_token = this.securityUtil.createAccessToken(loginDto.getUsername(), res);
+                String access_token = this.securityUtil.createAccessToken(authentication.getName(), res);
                 res.setAccessToken(access_token);
 
                 // create refresh token
-                String refresh_token = this.securityUtil.createRefreshToken(authentication.getName(), res);
+                String refresh_token = this.securityUtil.createRefreshToken(loginDto.getUsername(), res);
 
                 // update user
                 this.userService.updateUserToken(refresh_token, loginDto.getUsername());
@@ -106,6 +106,7 @@ public class AuthController {
                         userLogin.setId(currentUserDB.getId());
                         userLogin.setEmail(currentUserDB.getEmail());
                         userLogin.setName(currentUserDB.getName());
+                        userLogin.setRole(currentUserDB.getRole());
                         userGetAccount.setUser(userLogin);
                 }
 
