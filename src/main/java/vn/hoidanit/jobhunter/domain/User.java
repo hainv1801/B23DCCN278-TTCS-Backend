@@ -54,13 +54,17 @@ public class User {
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
-
     @ManyToOne
     @JoinColumn(name = "company_id")
     private Company company;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     List<Resume> resumes;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @PrePersist
     public void handleBeforeCreate() {

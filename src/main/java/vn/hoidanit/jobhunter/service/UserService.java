@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
+import vn.hoidanit.jobhunter.domain.Role;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
@@ -22,9 +23,11 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 public class UserService {
     private final UserRepository userRepository;
     private final CompanyService companyService;
+    private final RoleService roleService;
 
-    public UserService(UserRepository userRepository, CompanyService companyService) {
+    public UserService(UserRepository userRepository, CompanyService companyService, RoleService roleService) {
         this.userRepository = userRepository;
+        this.roleService = roleService;
         this.companyService = companyService;
     }
 
@@ -33,6 +36,11 @@ public class UserService {
         if (user.getCompany() != null) {
             Company company = this.companyService.handleGetCompanyById(user.getCompany().getId());
             user.setCompany(company);
+        }
+        // check role
+        if (user.getRole() != null) {
+            Role r = this.roleService.fetchById(user.getRole().getId());
+            user.setRole(r != null ? r : null);
         }
         return this.userRepository.save(user);
     }
@@ -62,18 +70,7 @@ public class UserService {
 
         rs.setMeta(mt);
         List<ResUserDTO> listUser = pageUser.getContent()
-                .stream().map(item -> new ResUserDTO(
-                        item.getId(),
-                        item.getEmail(),
-                        item.getName(),
-                        item.getGender(),
-                        item.getAddress(),
-                        item.getAge(),
-                        item.getUpdatedAt(),
-                        item.getCreatedAt(),
-                        new ResUserDTO.CompanyUser(
-                                item.getCompany() != null ? item.getCompany().getId() : 0,
-                                item.getCompany() != null ? item.getCompany().getName() : null)))
+                .stream().map(item -> this.convertToResUserDTO(item))
                 .collect(Collectors.toList());
 
         rs.setResult(listUser);
@@ -91,6 +88,11 @@ public class UserService {
             if (user.getCompany() != null) {
                 Company company = this.companyService.handleGetCompanyById(user.getCompany().getId());
                 updateUser.setCompany(company);
+            }
+            // check role
+            if (user.getRole() != null) {
+                Role r = this.roleService.fetchById(user.getRole().getId());
+                updateUser.setRole(r != null ? r : null);
             }
             return this.userRepository.save(updateUser);
         }
@@ -126,6 +128,7 @@ public class UserService {
     public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
         ResUpdateUserDTO res = new ResUpdateUserDTO();
         ResUpdateUserDTO.CompanyUser companyUser = new ResUpdateUserDTO.CompanyUser();
+
         res.setId(user.getId());
         res.setName(user.getName());
         res.setAge(user.getAge());
@@ -143,10 +146,16 @@ public class UserService {
     public ResUserDTO convertToResUserDTO(User user) {
         ResUserDTO res = new ResUserDTO();
         ResUserDTO.CompanyUser companyUser = new ResUserDTO.CompanyUser();
+        ResUserDTO.RoleUser roleUser = new ResUserDTO.RoleUser();
         if (user.getCompany() != null) {
             companyUser.setId(user.getCompany().getId());
             companyUser.setName(user.getCompany().getName());
             res.setCompanyUser(companyUser);
+        }
+        if (user.getRole() != null) {
+            roleUser.setId(user.getRole().getId());
+            roleUser.setName(user.getRole().getName());
+            res.setRoleUser(roleUser);
         }
         res.setId(user.getId());
         res.setEmail(user.getEmail());
