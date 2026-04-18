@@ -6,7 +6,7 @@ plugins {
 
 }
 
-group = "vn.hoidanit"
+group = "com.hainv"
 version = "0.0.1-SNAPSHOT"
 
 java {
